@@ -31,15 +31,6 @@ public class Database {
         return null;
     }
 
-    public void close(Connection con) {
-        if (con != null) {
-            try {
-                con.close();
-                log.print("Connection closed");
-            } catch (SQLException e) { log.error(e.toString()); }
-        }
-    }
-
     public boolean insertNewUser(User user){
         try (Connection connection = getConnection()){
             if (connection != null) {
