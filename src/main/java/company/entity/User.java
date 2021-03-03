@@ -18,7 +18,7 @@ public class User {
         this.fname = fname;
         this.lname = lname;
         this.age = age;
-        this.gender = gender==0?Gender.MALE:gender==1?Gender.FEMALE:Gender.OTHER;
+        this.gender = gender == 0?Gender.MALE:gender == 1?Gender.FEMALE:Gender.OTHER;
     }
 
     public int getId() {
