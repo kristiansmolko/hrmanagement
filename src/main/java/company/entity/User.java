@@ -40,4 +40,12 @@ public class User {
     public Gender getGender() {
         return gender;
     }
+
+    @Override
+    public String toString() {
+        return "\n--------------------------------------\n" +
+                "First name: " + fname + "\nLast name: " + lname +
+                "\nAge: " + age + "\nGender: " + gender +
+                "\n---------------------------------------\n";
+    }
 }
