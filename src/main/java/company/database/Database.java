@@ -13,6 +13,9 @@ public class Database {
     Log log = new Log();
     private final String insertQuery = "INSERT INTO user (fname, lname, age, gender) " +
             "VALUES (?, ?, ?, ?)";
+    private final String getUsersByAge = "SELECT * FROM user WHERE age BETWEEN ? AND ?";
+    private final String getUserById = "SELECT * FROM user WHERE id = ?";
+    private final String getAllUsers = "SELECT * from user";
 
     public Connection getConnection(){
         try {
@@ -70,6 +73,35 @@ public class Database {
     }
 
     public List<User> getUsersByAge(int from, int to){
+        if (from < 0 || to < 0 || from > to)
+            return null;
+        try (Connection connection = getConnection()){
+            PreparedStatement ps = connection.prepareStatement(getUsersByAge);
+            ps.setInt(1, from);
+            ps.setInt(2, to);
+            return executeSelect(ps);
+        } catch (Exception e) { log.error(e.toString()); }
+        return null;
+    }
+
+    public List<User> getAllUsers(){
+        try (Connection connection = getConnection()){
+            PreparedStatement ps = connection.prepareStatement(getAllUsers);
+            return executeSelect(ps);
+        } catch (Exception e) { log.error(e.toString()); }
+        return null;
+    }
+
+    public List<User> getUserById(int id){
+        if (id < 0) {
+            log.error("Wrong id");
+            return null;
+        }
+        try (Connection connection = getConnection()){
+            PreparedStatement ps = connection.prepareStatement(getUserById);
+            ps.setInt(1, id);
+            return executeSelect(ps);
+        } catch (Exception e) { log.error(e.toString()); }
         return null;
     }
 
