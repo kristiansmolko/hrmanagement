@@ -98,7 +98,7 @@ public class Database {
         return null;
     }
 
-    public List<User> getUserById(int id){
+    public User getUserById(int id){
         if (id < 0) {
             log.error("Wrong id");
             return null;
@@ -107,7 +107,11 @@ public class Database {
             if (connection != null) {
                 PreparedStatement ps = connection.prepareStatement(getUserById);
                 ps.setInt(1, id);
-                return executeSelect(ps);
+                List<User> list =  executeSelect(ps);
+                if (list.isEmpty())
+                    return null;
+                else
+                    return list.get(0);
             }
         } catch (Exception e) { log.error(e.toString()); }
         return null;
