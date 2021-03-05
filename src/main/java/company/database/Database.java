@@ -37,6 +37,8 @@ public class Database {
     }
 
     public boolean insertNewUser(User user){
+        if (user == null)
+            return false;
         try (Connection connection = getConnection()){
             if (connection != null) {
                 PreparedStatement ps = connection.prepareStatement(insertQuery);
@@ -149,6 +151,8 @@ public class Database {
     }
 
     public List<User> getUser(String pattern){
+        if (pattern == null || pattern.equals(""))
+            return null;
         try (Connection connection = getConnection()){
             if (connection != null){
                 PreparedStatement ps = connection.prepareStatement(getUserByPattern);
@@ -158,7 +162,6 @@ public class Database {
                 return executeSelect(ps);
             }
         } catch (Exception e) { log.error(e.toString()); }
-
         return null;
     }
 }
