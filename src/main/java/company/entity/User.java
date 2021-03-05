@@ -1,6 +1,7 @@
 package company.entity;
 
 import company.enums.Gender;
+import company.utill.Util;
 
 public class User {
     private int id;
@@ -8,6 +9,7 @@ public class User {
     private String lname;
     private int age;
     private Gender gender;
+    Util util = new Util();
 
     public User(int id, String fname, String lname, int age, int gender) {
         this(fname, lname, age, gender);
@@ -15,8 +17,8 @@ public class User {
     }
 
     public User(String fname, String lname, int age, int gender) {
-        this.fname = fname;
-        this.lname = lname;
+        this.fname = util.normalizeName(fname);
+        this.lname = util.normalizeName(lname);
         this.age = age;
         this.gender = gender == 0?Gender.MALE:gender == 1?Gender.FEMALE:Gender.OTHER;
     }
