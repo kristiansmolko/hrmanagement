@@ -65,10 +65,25 @@ public class Controller {
         return ResponseEntity.status(201).contentType(MediaType.APPLICATION_JSON).body(response.toJSONString());
     }
 
-    @GetMapping("/user/{input}")
-    public ResponseEntity<String> getUsersBy(){
-        List<User> list = dat.getMales();
+    @GetMapping("/user/{gender}")
+    public ResponseEntity<String> getUsersByGender(@PathVariable String gender){
+        List<User> list = null;
+        if (gender.equalsIgnoreCase("male")) list = dat.getMales();
+        else if (gender.equalsIgnoreCase("female")) list = dat.getFemales();
+        else return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(null);
         String object = util.getJson(list);
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
+    }
+
+    @GetMapping("/age")
+    public ResponseEntity<String> getUsersByAge(@RequestParam(value = "from") int value1, @RequestParam(value = "to") int value2){
+        if (value1 <= 0 || value2 <= 0 || value1 > value2){
+            JSONObject error = new JSONObject();
+            error.put("error", "Wrong input");
+            return  ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
+        }
+        List<User> list = dat.getUsersByAge(value1, value2);
+        String object = util.getJson(list);
+        return  ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
     }
 }
