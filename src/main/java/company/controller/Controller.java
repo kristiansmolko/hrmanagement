@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,6 +25,7 @@ public class Controller {
     public ResponseEntity<String> getUsers(){
         List<User> list = dat.getAllUsers();
         String object = util.getJson(list);
+        log.print("Users found");
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
     }
 
@@ -65,25 +67,81 @@ public class Controller {
         return ResponseEntity.status(201).contentType(MediaType.APPLICATION_JSON).body(response.toJSONString());
     }
 
-    @GetMapping("/user/{gender}")
-    public ResponseEntity<String> getUsersByGender(@PathVariable String gender){
+    @GetMapping(value = "/user", params = "gender")
+    public ResponseEntity<String> getUsersByGender(@RequestParam(value = "gender")String gender){
         List<User> list = null;
         if (gender.equalsIgnoreCase("male")) list = dat.getMales();
         else if (gender.equalsIgnoreCase("female")) list = dat.getFemales();
         else return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(null);
         String object = util.getJson(list);
+        log.print("Users found");
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
     }
 
-    @GetMapping("/age")
+    @GetMapping("/user/age")
     public ResponseEntity<String> getUsersByAge(@RequestParam(value = "from") int value1, @RequestParam(value = "to") int value2){
-        if (value1 <= 0 || value2 <= 0 || value1 > value2){
+        if (value1 <= 0 || value2 <= 0 || value1 > value2 || value1 >= 100 || value2 >= 100){
             JSONObject error = new JSONObject();
+            log.error("Wrong input");
             error.put("error", "Wrong input");
             return  ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
         }
         List<User> list = dat.getUsersByAge(value1, value2);
         String object = util.getJson(list);
+        log.print("Users found");
         return  ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<String> getUsersById(@PathVariable int id){
+        User u = dat.getUserById(id);
+        if (u == null) {
+            JSONObject error = new JSONObject();
+            log.error("This user does not exist");
+            error.put("error", "This user does not exist");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
+        }
+        String object = util.getJson(u);
+        log.print("User found");
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
+    }
+
+    @GetMapping(value = "/user", params = "search")
+    public ResponseEntity<String> getUsersBySubstring(@RequestParam(value = "search") String substring){
+        List<User> list = dat.getUser(substring);
+        if (list == null){
+            JSONObject error = new JSONObject();
+            log.error("Incorrect parameter");
+            error.put("error", "Incorrect parameter");
+            return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
+        }
+        String object = util.getJson(list);
+        log.print("Users found");
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<String> getDetails(){
+        JSONObject object = new JSONObject();
+        List<User> list = dat.getAllUsers();
+        double age = 0;
+        int min = 100;
+        int max = 0;
+        for (int i = 0; i < list.size(); i++){
+            int tempAge = list.get(i).getAge();
+            age += tempAge;
+            if (tempAge < min)
+                min = tempAge;
+            else if (tempAge > max)
+                max = tempAge;
+        }
+        object.put("count", list.size());
+        object.put("males", dat.getMales().size());
+        object.put("females", dat.getFemales().size());
+        object.put("age", util.normalizeNum(age/list.size()));
+        object.put("min", min);
+        object.put("max", max);
+
+        return  ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
 }
