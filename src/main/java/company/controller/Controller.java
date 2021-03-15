@@ -8,6 +8,7 @@ import company.utill.Util;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -141,7 +142,32 @@ public class Controller {
         object.put("age", util.normalizeNum(age/list.size()));
         object.put("min", min);
         object.put("max", max);
+        log.print("Success");
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+    }
 
-        return  ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<String> updateUserAge(@PathVariable int id, @RequestBody String data){
+        if (dat.getUserById(id) == null){
+            JSONObject error = new JSONObject();
+            error.put("error", "User not found");
+            log.error("User not found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
+        }
+        try {
+            JSONObject object = (JSONObject) new JSONParser().parse(data);
+            int newAge = Integer.parseInt(String.valueOf(object.get("newage")));
+            if (newAge <= 0 || newAge > 99){
+                JSONObject error = new JSONObject();
+                error.put("error", "Wrong input");
+                log.error("Wrong input");
+                return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
+            }
+            dat.changeAge(id, newAge);
+        } catch (ParseException e) { log.error(e.toString()); }
+        JSONObject object = new JSONObject();
+        object.put("info", "Age changed");
+        log.print("Age changed");
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
 }
