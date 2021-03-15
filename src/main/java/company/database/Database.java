@@ -18,6 +18,7 @@ public class Database {
     private final String getAllUsers = "SELECT * from user";
     private final String updateAge = "UPDATE user SET age = ? WHERE id = ?";
     private final String getUserByPattern = "SELECT * FROM user WHERE lname LIKE ? OR fname LIKE ?";
+    private final String deleteUser = "DELETE FROM user WHERE id = ?";
 
     public Connection getConnection(){
         try {
@@ -163,5 +164,21 @@ public class Database {
             }
         } catch (Exception e) { log.error(e.toString()); }
         return null;
+    }
+
+    public boolean deleteUser(int id){
+        if (getUserById(id) == null){
+            log.error("No user found");
+            return false;
+        }
+        try (Connection connection = getConnection()) {
+            PreparedStatement ps = connection.prepareStatement(deleteUser);
+            ps.setInt(1, id);
+            if (ps.executeUpdate() == 1){
+                log.print("Deleted user: " + id);
+                return true;
+            }
+        } catch (Exception e) { log.error(e.toString()); }
+        return false;
     }
 }
