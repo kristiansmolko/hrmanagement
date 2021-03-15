@@ -19,16 +19,20 @@ public class Util {
         object.put("size", list.size());
         JSONArray array = new JSONArray();
         for (User user : list) {
-            JSONObject jsonUser = new JSONObject();
-            jsonUser.put("id", user.getId());
-            jsonUser.put("fname", user.getFname());
-            jsonUser.put("lname", user.getLname());
-            jsonUser.put("age", user.getAge());
-            jsonUser.put("gender", user.getGender().toString());
-            array.add(jsonUser);
+            getJSONUser(array, user);
         }
         object.put("users", array);
         return object.toJSONString();
+    }
+
+    private void getJSONUser(JSONArray array, User user) {
+        JSONObject jsonUser = new JSONObject();
+        jsonUser.put("id", user.getId());
+        jsonUser.put("fname", user.getFname());
+        jsonUser.put("lname", user.getLname());
+        jsonUser.put("age", user.getAge());
+        jsonUser.put("gender", user.getGender().toString());
+        array.add(jsonUser);
     }
 
     public String getJson(User user){
@@ -38,13 +42,7 @@ public class Util {
         object.put("datetime", getCurrentDateTime());
         object.put("size", 1);
         JSONArray array = new JSONArray();
-        JSONObject jsonUser = new JSONObject();
-        jsonUser.put("id", user.getId());
-        jsonUser.put("fname", user.getFname());
-        jsonUser.put("lname", user.getLname());
-        jsonUser.put("age", user.getAge());
-        jsonUser.put("gender", user.getGender().toString());
-        array.add(jsonUser);
+        getJSONUser(array, user);
         object.put("users", array);
         return object.toJSONString();
     }
@@ -65,5 +63,11 @@ public class Util {
         return newName;
         //or better
         //return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase()
+    }
+
+    public double normalizeNum(double num){
+        num *= 100;
+        int number = (int) num;
+        return number/100.0;
     }
 }
