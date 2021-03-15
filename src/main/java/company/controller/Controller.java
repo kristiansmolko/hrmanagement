@@ -170,4 +170,17 @@ public class Controller {
         log.print("Age changed");
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteUser(@PathVariable int id){
+        if (dat.getUserById(id) == null){
+            JSONObject error = new JSONObject();
+            error.put("error", "User not found");
+            log.error("User not found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(error.toJSONString());
+        }
+        dat.deleteUser(id);
+        log.print("User deleted");
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(null);
+    }
 }
