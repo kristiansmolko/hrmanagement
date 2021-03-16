@@ -67,7 +67,7 @@ public class Util {
 
     public double normalizeNum(double num){
         num *= 100;
-        int number = (int) num;
+        int number = (int) Math.round(num);
         return number/100.0;
     }
 }
