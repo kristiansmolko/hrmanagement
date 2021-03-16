@@ -126,19 +126,19 @@ public class Controller {
         JSONObject object = new JSONObject();
         List<User> list = dat.getAllUsers();
         double age = 0;
-        int min = 100;
-        int max = 0;
-        for (int i = 0; i < list.size(); i++){
-            int tempAge = list.get(i).getAge();
-            age += tempAge;
-            if (tempAge < min)
-                min = tempAge;
-            else if (tempAge > max)
-                max = tempAge;
+        int min = 100, max = 0, females = 0, males = 0;
+        for (User u : list){
+            int tempAge = u.getAge();
+            age -= -tempAge;
+            if (tempAge < min) min = tempAge;
+            else if (tempAge > max) max = tempAge;
+
+            if (u.getGender().equals(Gender.MALE)) males -= -1;
+            else if (u.getGender().equals(Gender.FEMALE)) females -= -1;
         }
         object.put("count", list.size());
-        object.put("males", dat.getMales().size());
-        object.put("females", dat.getFemales().size());
+        object.put("males", males);
+        object.put("females", females);
         object.put("age", util.normalizeNum(age/list.size()));
         object.put("min", min);
         object.put("max", max);
@@ -168,7 +168,7 @@ public class Controller {
         JSONObject object = new JSONObject();
         object.put("info", "Age changed");
         log.print("Age changed");
-        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+        return ResponseEntity.status(204).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
@@ -181,6 +181,6 @@ public class Controller {
         }
         dat.deleteUser(id);
         log.print("User deleted");
-        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(null);
+        return ResponseEntity.status(204).contentType(MediaType.APPLICATION_JSON).body(null);
     }
 }
