@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Server</title>
+	<meta charset="UTF-8"/>
+    <style>
+        body {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <form method="GET" action="">
+            <table>
+                <tr>
+                    <td>First name:</td>
+                    <td><input type="text" id="fname" required></td>
+                </tr>
+                <tr>
+                    <td>Last name:</td>
+                    <td><input type="text" id="lname" required></td>
+                </tr>
+                <tr>
+                    <td>Age:</td>
+                    <td><input type="number" id="age" min="1" max="99" required></td>
+                </tr>
+                <tr>
+                    <td>Gender:</td>
+                    <td>
+                        <select id="gender">
+                        <option value="male">male</option>
+                        <option value="female">female</option>
+                        <option value="other" selected>other</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="reset" value="reset"></td>
+                    <td><input type="button" value="add user" onclick="send()"></td>
+                    <td><input type="button" value="get test" onclick="getTest()"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+	<script type="text/javascript">
+    function get() {
+       let url = 'localhost:8080/test';
+       fetch(url)
+       .then(res => res.json())
+       .then((out) => {
+           console.log("look json! ", out);
+       })
+       .catch(err => { throw err });
+    }
+    function send() {
+        const fname = document.getElementById('fname').value;
+        const lname = document.getElementById('lname').value;
+        const age = document.getElementById('age').value;
+        const gender = document.getElementById('gender').value;
+        const object = {
+            fname: fname,
+            lname: lname,
+            age: parseInt(age, 10),
+            gender: gender
+        }
+        const json = JSON.stringify(object);
+        fetch('http://localhost:8080/user/new', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json'
+                        },
+                        mode:"no-cors",
+                body: JSON.stringify(object)
+            })
+            .then(response => response.json)
+            .catch(err => console.error(err))
+    }
+	</script>
+</body>
+
+</html>
