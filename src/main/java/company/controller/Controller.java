@@ -183,4 +183,11 @@ public class Controller {
         log.print("User deleted");
         return ResponseEntity.status(204).contentType(MediaType.APPLICATION_JSON).body(null);
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test(){
+        JSONObject object = new JSONObject();
+        object.put("test", 15);
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+    }
 }
