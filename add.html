@@ -46,14 +46,31 @@
         </form>
     </div>
 	<script type="text/javascript">
-    function get() {
-       let url = 'localhost:8080/test';
-       fetch(url)
-       .then(res => res.json())
-       .then((out) => {
-           console.log("look json! ", out);
-       })
-       .catch(err => { throw err });
+    let data;
+    // async function getTestJson() {
+    //    let url = 'http://localhost:8080/test.';
+    //    try {
+    //         let res = await fetch(url, { mode: 'no-cors' });
+    //         console.log(res);
+    //         return await res.json();
+    //    } catch (error) { console.log(error); }
+       
+    // }
+    function getTest() {
+        fetch('http://localhost:8080/test', {mode: 'cors'})
+        .then(
+            function(response) {
+                if (response.status !== 200){
+                    console.log('Something is wrong ' + response.status);
+                    return;
+                }
+                response.json().then(function(data){
+                    console.log(data);
+                });
+            }
+        ).catch(function(err) {
+            console.log("Error", err);
+        });
     }
     function send() {
         const fname = document.getElementById('fname').value;
