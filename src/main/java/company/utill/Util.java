@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Util {
     public String getJson(List<User> list){
@@ -69,5 +72,25 @@ public class Util {
         num *= 100;
         int number = (int) Math.round(num);
         return number/100.0;
+    }
+
+    public String generateToken(){
+        String token = "";
+        Random rnd = new Random();
+        for (int i = 0; i < 40; i++){
+            int x = rnd.nextInt(3);
+            switch(x){
+                case 0: token = token + (char)(rnd.nextInt(26)+65); break;
+                case 1: token = token + (char)(rnd.nextInt(26)+97); break;
+                case 2: token = token + (char)(rnd.nextInt(10)+48); break;
+            }
+        }
+        return token;
+    }
+
+    public boolean authorizeToken(String token){
+        Pattern pattern = Pattern.compile("^(Bearer )[a-zA-z0-9]{40}$");
+        Matcher matcher = pattern.matcher(token);
+        return matcher.find();
     }
 }
