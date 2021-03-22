@@ -68,13 +68,35 @@ public class SecretController {
             for (Map.Entry<String, String> entry : map.entrySet())
                 if (entry.getValue().equals(token)) {
                     map.remove(entry.getKey());
-                    log.print("Logged out user " + entry.getKey());
+                    log.info("Logged out user " + entry.getKey());
                     return ResponseEntity.status(200).body("User logged out");
                 }
             return ResponseEntity.status(404).body("User not found");
         } catch (Exception e) { log.error(e.toString()); }
         log.error("Error");
         return ResponseEntity.status(400).body("Error");
+    }
+
+    @RequestMapping(value = "/booking", method = RequestMethod.GET)
+    public ResponseEntity<String> getBooking(@RequestBody String body) throws ParseException {
+        JSONObject response = new JSONObject();
+        response.put("Hotel", "Kosice Hotel");
+        response.put("Country", "Slovakia");
+        response.put("City", "Kosice");
+        response.put("Status", "Pending");
+        JSONObject object = (JSONObject) new JSONParser().parse(body);
+        String token = String.valueOf(object.get("token"));
+        if (!token.isEmpty()) {
+            String tokenNum = token.substring(7);
+            for (Map.Entry<String, String> entry : map.entrySet())
+                if (entry.getValue().equals(tokenNum)) {
+                    response.put("User", entry.getKey());
+                    response.remove("Status");
+                    response.put("Status", "Pay 200$");
+                }
+        }
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(
+                response.toJSONString());
     }
 
 }
