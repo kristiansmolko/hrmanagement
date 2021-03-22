@@ -12,8 +12,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 public class Util {
+    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+
     public String getJson(List<User> list){
         if (list.isEmpty())
             return "{}";
@@ -75,21 +80,13 @@ public class Util {
     }
 
     public String generateToken(){
-        String token = "";
-        Random rnd = new Random();
-        for (int i = 0; i < 40; i++){
-            int x = rnd.nextInt(3);
-            switch(x){
-                case 0: token = token + (char)(rnd.nextInt(26)+65); break;
-                case 1: token = token + (char)(rnd.nextInt(26)+97); break;
-                case 2: token = token + (char)(rnd.nextInt(10)+48); break;
-            }
-        }
-        return token;
+        byte[] randomBytes = new byte[32];
+        secureRandom.nextBytes(randomBytes);
+        return base64Encoder.encodeToString(randomBytes);
     }
 
     public boolean authorizeToken(String token){
-        Pattern pattern = Pattern.compile("^(Bearer )[a-zA-z0-9]{40}$");
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9_-]{43}(=)$");
         Matcher matcher = pattern.matcher(token);
         return matcher.find();
     }
