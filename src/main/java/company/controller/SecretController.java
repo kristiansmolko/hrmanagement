@@ -54,8 +54,22 @@ public class SecretController {
             json.put("token", "Bearer " + token);
 
             return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(json.toJSONString());
-        } catch (ParseException e) { e.printStackTrace(); }
+        } catch (ParseException e) { log.error(e.toString()); }
         return null;
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
+    public ResponseEntity<String> logout(@RequestBody String data){
+        try {
+            JSONObject object = (JSONObject) new JSONParser().parse(data);
+            String user = (String) object.get("user");
+            for (Map.Entry<String, String> entry : map.entrySet())
+                if (entry.getKey().equals(user)) {
+                    map.remove(user);
+                    return ResponseEntity.status(200).body("User logged out");
+                }
+        } catch (Exception e) { log.error(e.toString()); }
+        return ResponseEntity.status(400).body("Error");
     }
 
 }
