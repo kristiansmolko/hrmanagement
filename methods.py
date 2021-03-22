@@ -1,5 +1,6 @@
 import mysql.connector as mysqlConnector
 from mysql.connector import Error
+import secret
 
 
 def getUser(id):
@@ -13,7 +14,7 @@ def getUser(id):
              False (if user is not found or if < 0)
     """
 
-    connection = create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    connection = create_db_connection(secret.host, secret.user, secret.passwd, 'company')
     query = "SELECT * FROM user WHERE id = " + str(id)
     results = read_query(connection, query)
     if not results or id < 0:
@@ -116,7 +117,7 @@ def getDetails():
 
     Returns: nothing
     """
-    connection = create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    connection = create_db_connection(secret.host, secret.user, secret.passwd, 'company')
     query = "SELECT * FROM user"
     array = createArray(connection, query)
     males = 0

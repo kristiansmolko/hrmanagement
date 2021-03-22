@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
 import json
 import methods
+import secret
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,7 +17,7 @@ def getUsers():
     """
 
     # connection to database
-    connection = methods.create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    connection = methods.create_db_connection(secret.host, secret.user, secret.passwd, 'company')
     # query argument
     query = "SELECT * FROM user"
     # create array
@@ -37,13 +38,20 @@ def usersByAge():
 
     a = request.args.get('from')
     b = request.args.get('to')
+    # getting parameters
     if int(a) > int(b):
+        # if 'from' is lower than 'to' return wrong input
         return "Wrong input", 400
     if int(a) < 0 or int(b) < 0:
+        # if 'from' or 'to' is negative value return wrong value
         return "Wrong value", 400
-    connection = methods.create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    # connect to database
+    connection = methods.create_db_connection(secret.host, secret.user, secret.passwd, 'company')
+    # create query to search for users between age a and b
     query = "SELECT * FROM user WHERE age BETWEEN " + a + " AND " + b
+    # create array with users
     array = methods.createArray(connection, query)
+    # return array with users
     return json.dumps({'count': len(array), 'users': array}, indent=4, ensure_ascii=False), 200
 
 
@@ -55,7 +63,7 @@ def usersBy():
     Returns: json format with users
     """
 
-    connection = methods.create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    connection = methods.create_db_connection(secret.host, secret.user, secret.passwd, 'company')
     if request.args.get('gender'):
         """
         If parameter is gender, method will connect to database,
@@ -96,7 +104,7 @@ def user(id):
     according to method selected
     """
 
-    connection = methods.create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    connection = methods.create_db_connection(secret.host, secret.user, secret.passwd, 'company')
     query = f"DELETE FROM user WHERE id = {id}"
     if request.method == 'GET':
         """
@@ -184,7 +192,7 @@ def insertNewUser():
     if age > 100 or age < 0:
         return "Wrong age", 400
     gender = 2 if body.get('gender') is None else 1 if body.get('gender').lower() == 'female' else 0
-    connection = methods.create_db_connection('itsovy.sk', 'mysqluser', 'Kosice2021!', 'company')
+    connection = methods.create_db_connection(secret.host, secret.user, secret.passwd, 'company')
     query = f"INSERT INTO user(fname, lname, age, gender) VALUES('{fname}', '{lname}', {age}, {gender})"
     if methods.execute_query(connection, query) is None:
         return "Error", 400
