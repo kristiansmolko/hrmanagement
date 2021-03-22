@@ -30,6 +30,7 @@ public class SecretController {
         for (Map.Entry<String, String> entry : map.entrySet())
             if (entry.getValue().equals(tokenNum))
                 return ok.body("Welcome message for " + entry.getKey());
+        log.error("Unauthorized access");
         return unauthorized.body("Unauthorized access");
     }
 
@@ -52,23 +53,27 @@ public class SecretController {
             JSONObject json = new JSONObject();
             json.put("login", login);
             json.put("token", "Bearer " + token);
-
+            log.print("User logged in");
             return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(json.toJSONString());
         } catch (ParseException e) { log.error(e.toString()); }
-        return null;
+        log.error("Error");
+        return ResponseEntity.status(400).body("Error");
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
     public ResponseEntity<String> logout(@RequestBody String data){
         try {
             JSONObject object = (JSONObject) new JSONParser().parse(data);
-            String user = (String) object.get("user");
+            String token = ((String) object.get("token")).substring(7);
             for (Map.Entry<String, String> entry : map.entrySet())
-                if (entry.getKey().equals(user)) {
-                    map.remove(user);
+                if (entry.getValue().equals(token)) {
+                    map.remove(entry.getKey());
+                    log.print("Logged out user " + entry.getKey());
                     return ResponseEntity.status(200).body("User logged out");
                 }
+            return ResponseEntity.status(404).body("User not found");
         } catch (Exception e) { log.error(e.toString()); }
+        log.error("Error");
         return ResponseEntity.status(400).body("Error");
     }
 
