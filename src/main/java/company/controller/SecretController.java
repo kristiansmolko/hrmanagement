@@ -26,9 +26,8 @@ public class SecretController {
     public ResponseEntity<String> secret(@RequestHeader("token") String token){
         if (!util.authorizeToken(token))
             return badRequest.body("Wrong token");
-        String tokenNum = token.substring(7);
         for (Map.Entry<String, String> entry : map.entrySet())
-            if (entry.getValue().equals(tokenNum))
+            if (entry.getValue().equals(token))
                 return ok.body("Welcome message for " + entry.getKey());
         log.error("Unauthorized access");
         return unauthorized.body("Unauthorized access");
@@ -52,7 +51,7 @@ public class SecretController {
             map.put(login, token);
             JSONObject json = new JSONObject();
             json.put("login", login);
-            json.put("token", "Bearer " + token);
+            json.put("token", token);
             log.print("User logged in");
             return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(json.toJSONString());
         } catch (ParseException e) { log.error(e.toString()); }
@@ -64,7 +63,7 @@ public class SecretController {
     public ResponseEntity<String> logout(@RequestBody String data){
         try {
             JSONObject object = (JSONObject) new JSONParser().parse(data);
-            String token = ((String) object.get("token")).substring(7);
+            String token = (String) object.get("token");
             for (Map.Entry<String, String> entry : map.entrySet())
                 if (entry.getValue().equals(token)) {
                     map.remove(entry.getKey());
@@ -87,9 +86,8 @@ public class SecretController {
         JSONObject object = (JSONObject) new JSONParser().parse(body);
         String token = String.valueOf(object.get("token"));
         if (!token.isEmpty()) {
-            String tokenNum = token.substring(7);
             for (Map.Entry<String, String> entry : map.entrySet())
-                if (entry.getValue().equals(tokenNum)) {
+                if (entry.getValue().equals(token)) {
                     response.put("User", entry.getKey());
                     response.remove("Status");
                     response.put("Status", "Pay 200$");
