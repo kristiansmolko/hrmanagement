@@ -69,7 +69,10 @@ public class Controller {
             response.put("info", "User added");
             log.info("User added: " + newUser.toString());
 
-        } catch (Exception e) { log.error("Wrong input data"); }
+        } catch (Exception e) {
+            log.error("Wrong input data");
+            return ResponseEntity.status(400).body("Wrong input data");
+        }
         return ResponseEntity.status(201).contentType(MediaType.APPLICATION_JSON).body(response.toJSONString());
     }
 
