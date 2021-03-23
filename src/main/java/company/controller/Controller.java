@@ -2,6 +2,7 @@ package company.controller;
 
 import company.database.Database;
 import company.entity.User;
+import company.entity.XMLList;
 import company.enums.Gender;
 import company.log.Log;
 import company.utill.Util;
@@ -13,6 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,5 +194,23 @@ public class Controller {
         JSONObject object = new JSONObject();
         object.put("test", 15);
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+    }
+
+    @GetMapping(value = "/users", params = "type")
+    public ResponseEntity<String> getUsersXML(@RequestParam(value = "type") String type){
+        if(type == null || !type.equals("xml"))
+            return ResponseEntity.status(400).body("Wrong type");
+        List<User> list = dat.getAllUsers();
+        XMLList xml = new XMLList();
+        xml.setList(list);
+        try {
+            JAXBContext context = JAXBContext.newInstance(company.entity.XMLList.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(xml, sw);
+            return ResponseEntity.status(200).contentType(MediaType.APPLICATION_XML).body(sw.toString());
+        } catch (JAXBException e) { e.printStackTrace(); }
+        return ResponseEntity.status(400).body("Error");
     }
 }
