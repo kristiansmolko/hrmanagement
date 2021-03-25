@@ -1,6 +1,7 @@
 package company.controller;
 
 import company.log.Log;
+import company.user.Login;
 import company.utill.Util;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,8 +17,8 @@ import java.util.Map;
 public class SecretController {
     Log log = new Log();
     Util util = new Util();
+    Login login = new Login();
     Map<String, String> map = new HashMap();
-    private final String password = "Kosice2021!";
     private ResponseEntity.BodyBuilder unauthorized = ResponseEntity.status(401);
     private ResponseEntity.BodyBuilder badRequest = ResponseEntity.status(400);
     private ResponseEntity.BodyBuilder ok = ResponseEntity.status(200);
@@ -37,20 +38,20 @@ public class SecretController {
     public ResponseEntity<String> login(@RequestBody String data){
         try {
             JSONObject object = (JSONObject) new JSONParser().parse(data);
-            String login = (String) object.get("login");
+            String user = (String) object.get("login");
             String pass = (String) object.get("password");
-            if (login == null || pass == null || pass.isEmpty() || login.isEmpty()) {
+            if (user == null || pass == null || pass.isEmpty() || user.isEmpty()) {
                 log.error("Missing login or password");
                 return ResponseEntity.status(400).body("Missing name or password");
             }
-            if (!pass.equals(password)) {
-                log.error("Wrong password");
-                return ResponseEntity.status(401).body("Wrong password");
-            }
-            String token = util.generateToken();
-            map.put(login, token);
+            String token = login.loginUser(user, pass);
+            if (token == null)
+                return ResponseEntity.status(400).body("Wrong password");
+            else if (token.equals("401"))
+                return ResponseEntity.status(401).body("Wait minute before logging");
+            map.put(user, token);
             JSONObject json = new JSONObject();
-            json.put("login", login);
+            json.put("login", user);
             json.put("token", token);
             log.print("User logged in");
             return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(json.toJSONString());
