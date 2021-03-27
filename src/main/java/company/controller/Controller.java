@@ -1,12 +1,12 @@
 package company.controller;
 
-import company.database.Database;
+import company.database.DatabaseMONGO;
+import company.database.DatabaseMYSQL;
 import company.entity.User;
 import company.entity.XMLList;
 import company.enums.Gender;
 import company.log.Log;
 import company.utill.Util;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,12 +18,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class Controller {
-    Database dat = new Database();
+    DatabaseMYSQL dat = new DatabaseMYSQL();
+    DatabaseMONGO mongoDat = new DatabaseMONGO();
     Log log = new Log();
     Util util = new Util();
 
@@ -68,7 +68,7 @@ public class Controller {
             dat.insertNewUser(newUser);
             response.put("info", "User added");
             log.info("User added: " + newUser.toString());
-
+            mongoDat.insertUser(object);
         } catch (Exception e) {
             log.error("Wrong input data");
             return ResponseEntity.status(400).body("Wrong input data");
@@ -215,5 +215,13 @@ public class Controller {
             return ResponseEntity.status(200).contentType(MediaType.APPLICATION_XML).body(sw.toString());
         } catch (JAXBException e) { e.printStackTrace(); }
         return ResponseEntity.status(400).body("Error");
+    }
+
+    @GetMapping("/backend")
+    public ResponseEntity<String> getMongoUsers(){
+        List<User> list = mongoDat.getUsers();
+        String object = util.getJson(list);
+        log.print("Users found");
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
     }
 }
