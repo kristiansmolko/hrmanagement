@@ -8,6 +8,7 @@ import com.mongodb.client.MongoIterable;
 import company.entity.User;
 import company.log.Log;
 import org.bson.Document;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -47,5 +48,31 @@ public class DatabaseMONGO {
             } catch (ParseException e) { e.printStackTrace(); }
         }
         return list;
+    }
+
+    public void insertHobby(JSONObject object){
+        database = mongoClient.getDatabase("myFirstDb");
+        test = database.getCollection("hobby");
+        Document doc = Document.parse(object.toString());
+        test.insertOne(doc);
+        log.print("User added to mongodb");
+    }
+
+    public JSONObject getHobby(){
+        database = mongoClient.getDatabase("myFirstDb");
+        test = database.getCollection("hobby");
+        JSONObject json = new JSONObject();
+        JSONArray array = new JSONArray();
+        MongoCollection<Document> table = test;
+        for (Document doc : table.find()){
+            try {
+                JSONObject object = (JSONObject) new JSONParser().parse(doc.toJson());
+                System.out.println(object);
+                array.add(object);
+            } catch (ParseException e) { e.printStackTrace(); }
+        }
+        json.put("length", array.size());
+        json.put("users", array);
+        return json;
     }
 }
