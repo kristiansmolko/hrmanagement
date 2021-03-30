@@ -224,4 +224,26 @@ public class Controller {
         log.print("Users found");
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object);
     }
+
+    @PostMapping(value = "/hobby/user/{name}")
+    public ResponseEntity<String> addUserHobby(@PathVariable String name, @RequestBody String data){
+        if (name == null || name.isEmpty()) {
+            log.error("Missing name");
+            return ResponseEntity.status(400).body("Missing name");
+        }
+        try {
+            JSONObject object = (JSONObject) new JSONParser().parse(data);
+            object.put("name", name);
+            mongoDat.insertHobby(object);
+            return ResponseEntity.status(201).body("Added user with hobby");
+        } catch (ParseException e) { log.error(e.toString()); }
+        return ResponseEntity.status(400).body("Error");
+    }
+
+    @GetMapping("/hobby/users")
+    public ResponseEntity<String> getHobbies(){
+        JSONObject object = mongoDat.getHobby();
+        System.out.println(object);
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+    }
 }
