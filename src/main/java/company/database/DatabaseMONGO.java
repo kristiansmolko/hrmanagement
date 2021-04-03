@@ -1,10 +1,7 @@
 package company.database;
 
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoIterable;
+import com.mongodb.client.*;
 import company.entity.User;
 import company.log.Log;
 import org.bson.Document;
@@ -19,11 +16,24 @@ import java.util.List;
 public class DatabaseMONGO {
     Log log = new Log();
     private static final MongoClient mongoClient = new MongoClient();
-    private static MongoDatabase database;
+    private static final MongoDatabase database = mongoClient.getDatabase("myFirstDb");;
     private static MongoCollection<Document> test;
 
+    public boolean isUser(String name){
+        test = database.getCollection("hobby");
+        MongoCollection<Document> table = test;
+        for (Document doc : table.find()){
+            try {
+                JSONObject object = (JSONObject) new JSONParser().parse(doc.toJson());
+                if (object.containsValue(name))
+                    return true;
+            } catch (ParseException e) { e.printStackTrace(); }
+        }
+        return false;
+    }
+
     public void insertUser(JSONObject object){
-        database = mongoClient.getDatabase("myFirstDb");
+        //users dat
         test = database.getCollection("users");
         object.put("gender",
                 object.get("gender") == null ? 2 : object.get("gender").equals("female") ? 1 : 0);
@@ -33,8 +43,8 @@ public class DatabaseMONGO {
     }
 
     public List<User> getUsers(){
+        //users dat
         List<User> list = new ArrayList<>();
-        database = mongoClient.getDatabase("myFirstDb");
         test = database.getCollection("users");
         MongoCollection<Document> table = test;
         for (Document doc : table.find()){
@@ -51,7 +61,7 @@ public class DatabaseMONGO {
     }
 
     public void insertHobby(JSONObject object){
-        database = mongoClient.getDatabase("myFirstDb");
+        //hobby
         test = database.getCollection("hobby");
         Document doc = Document.parse(object.toString());
         test.insertOne(doc);
@@ -59,7 +69,7 @@ public class DatabaseMONGO {
     }
 
     public JSONObject getHobby(){
-        database = mongoClient.getDatabase("myFirstDb");
+        //hobby
         test = database.getCollection("hobby");
         JSONObject json = new JSONObject();
         JSONArray array = new JSONArray();
@@ -67,6 +77,7 @@ public class DatabaseMONGO {
         for (Document doc : table.find()){
             try {
                 JSONObject object = (JSONObject) new JSONParser().parse(doc.toJson());
+                object.remove("_id");
                 System.out.println(object);
                 array.add(object);
             } catch (ParseException e) { e.printStackTrace(); }
@@ -75,4 +86,15 @@ public class DatabaseMONGO {
         json.put("users", array);
         return json;
     }
+
+    public boolean deleteUser(String name){
+        //hobby
+        test = database.getCollection("hobby");
+        Document query = new Document();
+        query.put("name", name);
+        test.deleteOne(query);
+        return true;
+    }
+
+
 }
