@@ -5,6 +5,7 @@ import com.mongodb.client.*;
 import company.entity.User;
 import company.log.Log;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -32,8 +33,8 @@ public class DatabaseMONGO {
         return false;
     }
 
+    //users dat
     public void insertUser(JSONObject object){
-        //users dat
         test = database.getCollection("users");
         object.put("gender",
                 object.get("gender") == null ? 2 : object.get("gender").equals("female") ? 1 : 0);
@@ -42,8 +43,8 @@ public class DatabaseMONGO {
         log.print("User added to mongodb");
     }
 
+    //users dat
     public List<User> getUsers(){
-        //users dat
         List<User> list = new ArrayList<>();
         test = database.getCollection("users");
         MongoCollection<Document> table = test;
@@ -61,7 +62,6 @@ public class DatabaseMONGO {
     }
 
     public void insertHobby(JSONObject object){
-        //hobby
         test = database.getCollection("hobby");
         Document doc = Document.parse(object.toString());
         test.insertOne(doc);
@@ -69,7 +69,6 @@ public class DatabaseMONGO {
     }
 
     public JSONObject getHobby(){
-        //hobby
         test = database.getCollection("hobby");
         JSONObject json = new JSONObject();
         JSONArray array = new JSONArray();
@@ -87,8 +86,8 @@ public class DatabaseMONGO {
         return json;
     }
 
+    //hobby
     public boolean deleteUser(String name){
-        //hobby
         test = database.getCollection("hobby");
         Document query = new Document();
         query.put("name", name);
@@ -96,5 +95,14 @@ public class DatabaseMONGO {
         return true;
     }
 
-
+    public boolean updateHobby(String name, String newData){
+        test = database.getCollection("hobby");
+        Document doc = Document.parse(newData);
+        Bson filter = new Document("name", name);
+        Bson newValue = new Document("hobby", doc.get("hobby"));
+        Bson updateOperationDocument = new Document("$set", newValue);
+        System.out.println(updateOperationDocument);
+        test.updateOne(filter, updateOperationDocument);
+        return true;
+    }
 }
