@@ -231,6 +231,9 @@ public class Controller {
             log.error("Missing name");
             return ResponseEntity.status(400).body("Missing name");
         }
+        if (mongoDat.isUser(name)){
+
+        }
         try {
             JSONObject object = (JSONObject) new JSONParser().parse(data);
             object.put("name", name);
@@ -243,7 +246,15 @@ public class Controller {
     @GetMapping("/hobby/users")
     public ResponseEntity<String> getHobbies(){
         JSONObject object = mongoDat.getHobby();
-        System.out.println(object);
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
+    }
+
+    @DeleteMapping("/hobby/user/{name}")
+    public ResponseEntity<String> deleteUser(@PathVariable String name){
+        if (!mongoDat.isUser(name))
+            return ResponseEntity.status(404).body("User not found");
+        if (mongoDat.deleteUser(name))
+            return ResponseEntity.status(200).body("User deleted");
+        return ResponseEntity.status(400).body("Error");
     }
 }
