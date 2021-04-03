@@ -213,7 +213,7 @@ public class Controller {
             StringWriter sw = new StringWriter();
             marshaller.marshal(xml, sw);
             return ResponseEntity.status(200).contentType(MediaType.APPLICATION_XML).body(sw.toString());
-        } catch (JAXBException e) { e.printStackTrace(); }
+        } catch (JAXBException e) { log.error(e.toString()); }
         return ResponseEntity.status(400).body("Error");
     }
 
@@ -233,29 +233,38 @@ public class Controller {
         }
         if (mongoDat.isUser(name)){
             mongoDat.updateHobby(name, data);
+            log.print("User updated");
             return ResponseEntity.status(200).body("User");
         }
         try {
             JSONObject object = (JSONObject) new JSONParser().parse(data);
             object.put("name", name);
             mongoDat.insertHobby(object);
+            log.print("User created");
             return ResponseEntity.status(201).body("Added user with hobby");
         } catch (ParseException e) { log.error(e.toString()); }
+        log.error("Error");
         return ResponseEntity.status(400).body("Error");
     }
 
     @GetMapping("/hobby/users")
     public ResponseEntity<String> getHobbies(){
         JSONObject object = mongoDat.getHobby();
+        log.print("All users");
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
 
     @DeleteMapping("/hobby/user/{name}")
     public ResponseEntity<String> deleteUser(@PathVariable String name){
-        if (!mongoDat.isUser(name))
+        if (!mongoDat.isUser(name)) {
+            log.error("User not found");
             return ResponseEntity.status(404).body("User not found");
-        if (mongoDat.deleteUser(name))
+        }
+        if (mongoDat.deleteUser(name)) {
+            log.print("User deleted");
             return ResponseEntity.status(200).body("User deleted");
+        }
+        log.error("Error");
         return ResponseEntity.status(400).body("Error");
     }
 }
