@@ -94,13 +94,12 @@ public class DatabaseMONGO {
         return true;
     }
 
-    public boolean updateHobby(String name, String newData){
+    public void updateHobby(String name, String newData){
         test = database.getCollection("hobby");
         Document doc = Document.parse(newData);
         Bson filter = new Document("name", name);
         Bson newValue = new Document("hobby", doc.get("hobby"));
         Bson updateOperationDocument = new Document("$set", newValue);
         test.updateOne(filter, updateOperationDocument);
-        return true;
     }
 }
