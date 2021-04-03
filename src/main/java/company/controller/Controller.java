@@ -232,7 +232,8 @@ public class Controller {
             return ResponseEntity.status(400).body("Missing name");
         }
         if (mongoDat.isUser(name)){
-
+            mongoDat.updateHobby(name, data);
+            return ResponseEntity.status(200).body("User");
         }
         try {
             JSONObject object = (JSONObject) new JSONParser().parse(data);
