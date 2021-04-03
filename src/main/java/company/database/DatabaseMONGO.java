@@ -77,7 +77,6 @@ public class DatabaseMONGO {
             try {
                 JSONObject object = (JSONObject) new JSONParser().parse(doc.toJson());
                 object.remove("_id");
-                System.out.println(object);
                 array.add(object);
             } catch (ParseException e) { e.printStackTrace(); }
         }
@@ -101,7 +100,6 @@ public class DatabaseMONGO {
         Bson filter = new Document("name", name);
         Bson newValue = new Document("hobby", doc.get("hobby"));
         Bson updateOperationDocument = new Document("$set", newValue);
-        System.out.println(updateOperationDocument);
         test.updateOne(filter, updateOperationDocument);
         return true;
     }
