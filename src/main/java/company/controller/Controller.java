@@ -7,6 +7,7 @@ import company.entity.XMLList;
 import company.enums.Gender;
 import company.log.Log;
 import company.utill.Util;
+import io.swagger.annotations.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -21,6 +22,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 @RestController
+//@RequestMapping("/api")
 public class Controller {
     DatabaseMYSQL dat = new DatabaseMYSQL();
     DatabaseMONGO mongoDat = new DatabaseMONGO();
@@ -36,6 +38,8 @@ public class Controller {
     }
 
     @PostMapping("/user/new")
+    @ApiOperation(value = "Insert new user to database",
+            notes = "Accepts json with fname, lname and age value, gender is not mandatory (default value: other)")
     public ResponseEntity<String> insertNewUser(@RequestBody String data){
         JSONObject response = new JSONObject();
         try {
@@ -77,6 +81,7 @@ public class Controller {
     }
 
     @GetMapping(value = "/user", params = "gender")
+    @ApiOperation(value = "Get users by gender")
     public ResponseEntity<String> getUsersByGender(@RequestParam(value = "gender")String gender){
         List<User> list = null;
         if (gender.equalsIgnoreCase("male")) list = dat.getMales();
@@ -102,7 +107,27 @@ public class Controller {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<String> getUsersById(@PathVariable int id){
+    @ApiOperation(
+            value = "Get user based on ID",
+            notes = "Accepts number and returns user with specified id, if exist",
+            responseContainer = "List",
+            response = User.class
+    )
+//    @ApiResponse(
+//            code = 200,
+//            message = "Successfully found user",
+//            response = User.class,
+//            responseContainer = "List"
+//    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Successfully found user", responseContainer = "List"),
+                    @ApiResponse(code = 404, message = "Could not find user"),
+                    @ApiResponse(code = 500, message = "Internal error")
+            }
+    )
+    public ResponseEntity<String> getUsersById(@ApiParam(value = "ID value for user", required = true)
+                                                   @PathVariable int id){
         User u = dat.getUserById(id);
         if (u == null) {
             JSONObject error = new JSONObject();
@@ -154,7 +179,7 @@ public class Controller {
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
+    @PutMapping("/user/{id}")
     public ResponseEntity<String> updateUserAge(@PathVariable int id, @RequestBody String data){
         if (dat.getUserById(id) == null){
             JSONObject error = new JSONObject();
@@ -179,7 +204,7 @@ public class Controller {
         return ResponseEntity.status(204).contentType(MediaType.APPLICATION_JSON).body(object.toJSONString());
     }
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("/user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable int id){
         if (dat.getUserById(id) == null){
             JSONObject error = new JSONObject();

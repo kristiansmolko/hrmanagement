@@ -2,16 +2,24 @@ package company.entity;
 
 import company.enums.Gender;
 import company.utill.Util;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "user")
+@ApiModel(description = "Details about User class")
 public class User {
+    @ApiModelProperty(notes = "ID of user", example = "id : 4")
     private int id;
+    @ApiModelProperty(notes = "First name of user", example = "fname: \"Jan\"")
     private String fname;
+    @ApiModelProperty(notes = "Last name of user")
     private String lname;
+    @ApiModelProperty(notes = "Age of user")
     private int age;
+    @ApiModelProperty(notes = "Gender of user")
     private Gender gender;
     Util util = new Util();
 
